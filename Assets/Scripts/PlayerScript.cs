@@ -10,14 +10,29 @@ public class PlayerScript : MonoBehaviour
     public float speed;
 
     public Text score;
+    
+    public AudioSource playSound;
 
     private int scoreValue = 0;
+
+    public GameObject winTextObject;
+
+    public GameObject losetextObject;
+
+    private int livesvalue;
+
+    public Text lives;
 
     // Start is called before the first frame update
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
-        score.text = scoreValue.ToString();
+        score.text = "Score: " + scoreValue.ToString();
+        winTextObject.SetActive(false);
+        losetextObject.SetActive(false);
+        livesvalue = 3;
+        Setlivestext();
+
     }
 
     // Update is called once per frame
@@ -34,16 +49,45 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    void Setlivestext()
+    {
+        lives.text = "Lives: " + livesvalue.ToString();
+    }
     private void OnCollisionEnter2D(Collision2D collision)
     {
+
+        if (collision.collider.tag == "Enemy")
+        {
+            livesvalue -=1;
+            lives.text = "Lives: " + livesvalue.ToString();
+            Destroy(collision.collider.gameObject);
+        }
        if (collision.collider.tag == "Coin")
         {
             scoreValue += 1;
-            score.text = scoreValue.ToString();
+            score.text = "Score " + scoreValue.ToString();
             Destroy(collision.collider.gameObject);
         }
 
+        if (scoreValue >= 4)
+        {
+            winTextObject.SetActive(true);
+            Destroy(this.gameObject);
+            
+        }
+
+        if (livesvalue <= 0)
+        {
+            losetextObject.SetActive(true);
+            Destroy(this.gameObject);
+        }
+
+        
+
     }
+
+   
+    
 
     private void OnCollisionStay2D(Collision2D collision)
     {
@@ -54,5 +98,7 @@ public class PlayerScript : MonoBehaviour
                 rd2d.AddForce(new Vector2(0, 3), ForceMode2D.Impulse); //the 3 in this line of code is the player's "jumpforce," and you change that number to get different jump behaviors.  You can also create a public variable for it and then edit it in the inspector.
             }
         }
+
+        
     }
 }
